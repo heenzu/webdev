@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { Badge, Box, IconButton } from "@mui/material";
+import { Badge, Box, IconButton, Menu, MenuItem } from "@mui/material";
 import {
   PersonOutline,
   ShoppingBagOutlined,
@@ -9,11 +9,28 @@ import {
 import { useNavigate } from "react-router-dom";
 import { shades } from "../../theme";
 import { setIsCartOpen } from "../../state";
+import { useState } from "react";
 
 function Navbar() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart.cart);
+
+  // Check for authentication
+  const token = localStorage.getItem("token");
+  const isAuthenticated = !!token;
+
+  // State for user menu
+  const [anchorEl, setAnchorEl] = useState(null);
+  const handleMenuOpen = (event) => setAnchorEl(event.currentTarget);
+  const handleMenuClose = () => setAnchorEl(null);
+
+  // Logout functionality
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    handleMenuClose();
+    navigate("/login"); // Redirect to login after logout
+  };
 
   return (
     <Box
@@ -51,9 +68,26 @@ function Navbar() {
           <IconButton sx={{ color: "black" }}>
             <SearchOutlined />
           </IconButton>
-          <IconButton sx={{ color: "black" }}>
+
+          {/* User Authentication Section */}
+          <IconButton sx={{ color: "black" }} onClick={handleMenuOpen}>
             <PersonOutline />
           </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+          >
+            {!isAuthenticated ? (
+              <>
+                <MenuItem onClick={() => navigate("/login")}>Login</MenuItem>
+                <MenuItem onClick={() => navigate("/signup")}>Sign Up</MenuItem>
+              </>
+            ) : (
+              <MenuItem onClick={handleLogout}>Logout</MenuItem>
+            )}
+          </Menu>
+
           <Badge
             badgeContent={cart.length}
             color="secondary"
