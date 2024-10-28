@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import './Loginpage.css';  // Assuming you're still using a similar style from the earlier example
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -9,37 +10,55 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      // Posting to authentication API
       const res = await axios.post("http://localhost:1337/api/auth/local", {
         identifier: email,
         password: password,
       });
 
-      // Save token to localStorage
+      // Save token to localStorage and redirect
       localStorage.setItem('token', res.data.jwt);
       window.location.href = "/";
     } catch (err) {
-      setError("Invalid credentials");
+      setError("Invalid credentials"); // Set error message if authentication fails
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Login</h2>
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="Email"
-      />
-      <input
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="Password"
-      />
-      <button type="submit">Login</button>
-      {error && <p>{error}</p>}
-    </form>
+    <div className="login-container">
+      <div className="login-box">
+        <h2 className="login-title">LOGIN TO <span className="brand">ECOMMER</span></h2>
+        <form onSubmit={handleSubmit} className="login-form">
+          <div className="input-field">
+            <label htmlFor="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email"
+              required
+            />
+          </div>
+          <div className="input-field">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              id="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              required
+            />
+          </div>
+          <button type="submit" className="login-button">Login</button>
+          {error && <p className="error-text">{error}</p>}
+        </form>
+        <p className="signup-text">
+          Don't have an account? <a href="/signup">Sign Up</a>
+        </p>
+      </div>
+    </div>
   );
 };
 
